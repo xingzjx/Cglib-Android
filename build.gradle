@@ -28,3 +28,52 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+class BuildTimeListener implements TaskExecutionListener, BuildListener {
+
+    def beforeTime = 0
+    List<String> timeList = new ArrayList<>()
+    List<String> taskList = new ArrayList<>()
+
+
+    @Override
+    void buildStarted(Gradle gradle) {
+
+    }
+
+    @Override
+    void settingsEvaluated(Settings settings) {
+
+    }
+
+    @Override
+    void projectsLoaded(Gradle gradle) {
+
+    }
+
+    @Override
+    void projectsEvaluated(Gradle gradle) {
+
+    }
+
+    @Override
+    void buildFinished(BuildResult result) {
+        for (int i = 0; i < timeList.size(); i++) {
+            println(taskList.get(i) + " 执行时间 " + timeList.get(i))
+        }
+    }
+
+    @Override
+    void beforeExecute(Task task) {
+        beforeTime = System.currentTimeMillis()
+    }
+
+    @Override
+    void afterExecute(Task task, TaskState state) {
+        def disTime = System.currentTimeMillis() - beforeTime
+        taskList.add(task.getName())
+        timeList.add(disTime)
+    }
+}
+
+project.gradle.addListener(new BuildTimeListener())
